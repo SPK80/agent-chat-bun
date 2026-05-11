@@ -1,0 +1,16 @@
+.wave-shimmer {
+  min-height: 30px;
+  width: 80%;
+  background: linear-gradient(90deg, #e9ecef 25%, #dee2e6 50%, #e9ecef 75%);
+  background-size: 200% 100%;
+  animation: waveShimmer 1.8s infinite linear;
+}
+
+@keyframes waveShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
