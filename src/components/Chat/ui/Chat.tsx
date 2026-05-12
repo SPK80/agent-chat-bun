@@ -7,9 +7,9 @@ import {
 } from "react";
 import "./Chat.css";
 import ReactMarkdown from "react-markdown";
-import type { Message } from "ollama";
+import { type Message } from "ollama";
 import { Button, Input, notification } from "antd";
-import { DeleteOutlined, MessageOutlined } from "@ant-design/icons";
+import { CloseOutlined, DeleteOutlined, SendOutlined } from "@ant-design/icons";
 import ModelsSelect from "../../../components/ModelsSelect";
 import { useOllamaChat } from "../hooks/useOllamaChat";
 import { TypingIndicator } from "../../../components/TypingIndicator";
@@ -22,7 +22,7 @@ export const Chat = ({ id }: IProps) => {
   const [{ warning }, contextHolder] = notification.useNotification();
   const [model, setModel] = useState("");
 
-  const { messages, setMessages, response, post } = useOllamaChat({
+  const { messages, setMessages, response, post, abort } = useOllamaChat({
     model,
     initialMessages: JSON.parse(
       localStorage.getItem(`chat#${id}`) ?? "[]",
@@ -119,13 +119,24 @@ export const Chat = ({ id }: IProps) => {
             autoSize={{ minRows: 1, maxRows: 10 }}
             placeholder="Напишите сообщение..."
           />
-          <Button
-            onClick={send}
-            type="primary"
-            shape="circle"
-            style={{ padding: 0 }}
-            icon={<MessageOutlined />}
-          />
+          {waiting && response?.length ? (
+            <Button
+              onClick={abort}
+              type="primary"
+              shape="circle"
+              style={{ padding: "2px 0 0 0" }}
+              icon={<CloseOutlined />}
+            />
+          ) : (
+            <Button
+              onClick={send}
+              type="primary"
+              shape="circle"
+              style={{ padding: "2px 0 0 2px" }}
+              icon={<SendOutlined />}
+              disabled={waiting}
+            />
+          )}
         </div>
       </div>
     </>

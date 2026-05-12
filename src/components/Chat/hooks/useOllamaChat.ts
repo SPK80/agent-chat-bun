@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ollama, { type Message } from "ollama";
 
 export const useOllamaChat = ({
@@ -10,6 +10,7 @@ export const useOllamaChat = ({
 }) => {
   const [response, setResponse] = useState("");
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const abortRef = useRef<() => void>(() => {});
 
   const post = async (value: string) => {
     const newMessages = [
@@ -29,6 +30,8 @@ export const useOllamaChat = ({
       stream: true,
     });
 
+    abortRef.current = () => stream.abort();
+
     let content = response;
     for await (const part of stream) {
       setResponse((prev) => {
@@ -42,5 +45,5 @@ export const useOllamaChat = ({
     }
   };
 
-  return { response, messages, setMessages, post };
+  return { response, messages, setMessages, post, abort: abortRef.current };
 };
