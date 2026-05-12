@@ -9,7 +9,7 @@ import "./Chat.css";
 import ReactMarkdown from "react-markdown";
 import type { Message } from "ollama";
 import { Button, Input, notification } from "antd";
-import { UpOutlined, DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, MessageOutlined } from "@ant-design/icons";
 import ModelsSelect from "../../../components/ModelsSelect";
 import { useOllamaChat } from "../hooks/useOllamaChat";
 import { TypingIndicator } from "../../../components/TypingIndicator";
@@ -76,58 +76,58 @@ export const Chat = ({ id }: IProps) => {
   };
 
   return (
-    <div className="chat-container">
+    <>
       {contextHolder}
       <div className="chat-header">
-        Чат
+        <ModelsSelect onSelect={setModel} />
+        <span className="title">Чат</span>
         <Button
-          className="clear-button"
           onClick={clearChat}
           icon={<DeleteOutlined />}
           disabled={!messages.length || waiting}
         />
       </div>
-
-      <div className="messages">
-        {messages.map((msg, index) => (
-          <Fragment key={index}>
-            <div
-              className={`message ${msg.role === "user" ? "sent" : "received"}`}
-            >
-              <ReactMarkdown>{msg.content}</ReactMarkdown>
-            </div>
-            {index === messages.length - 1 &&
-              msg.role === "user" &&
-              waiting && (
-                <div className="message received">
-                  {response?.length ? (
-                    <ReactMarkdown>{response}</ReactMarkdown>
-                  ) : (
-                    <TypingIndicator />
-                  )}
-                </div>
-              )}
-          </Fragment>
-        ))}
-        <div ref={messagesEndRef} />
+      <div className="chat-container">
+        <div className="messages">
+          {messages.map((msg, index) => (
+            <Fragment key={index}>
+              <div
+                className={`message ${msg.role === "user" ? "sent" : "received"}`}
+              >
+                <ReactMarkdown>{msg.content}</ReactMarkdown>
+              </div>
+              {index === messages.length - 1 &&
+                msg.role === "user" &&
+                waiting && (
+                  <div className="message received">
+                    {response?.length ? (
+                      <ReactMarkdown>{response}</ReactMarkdown>
+                    ) : (
+                      <TypingIndicator />
+                    )}
+                  </div>
+                )}
+            </Fragment>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <div className="input-area">
+          <Input.TextArea
+            value={inputValue}
+            onKeyUp={handleKeyUp}
+            onChange={(e) => setInputValue(e.target.value)}
+            autoSize={{ minRows: 1, maxRows: 10 }}
+            placeholder="Напишите сообщение..."
+          />
+          <Button
+            onClick={send}
+            type="primary"
+            shape="circle"
+            style={{ padding: 0 }}
+            icon={<MessageOutlined />}
+          />
+        </div>
       </div>
-      <div className="input-area">
-        <ModelsSelect onSelect={setModel} />
-        <Input.TextArea
-          value={inputValue}
-          onKeyUp={handleKeyUp}
-          onChange={(e) => setInputValue(e.target.value)}
-          autoSize={{ minRows: 1, maxRows: 10 }}
-          placeholder="Напишите сообщение..."
-        />
-        <Button
-          onClick={send}
-          type="primary"
-          shape="circle"
-          style={{ padding: 0 }}
-          icon={<UpOutlined />}
-        />
-      </div>
-    </div>
+    </>
   );
 };

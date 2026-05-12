@@ -11,7 +11,6 @@ body {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
   width: 80vw;
   margin: 0 auto;
   background-color: white;
@@ -22,17 +21,28 @@ body {
 .chat-header {
   padding: 16px;
   background-color: #007bff;
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  position: relative;
-}
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 80vw;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
 
-.clear-button {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
+  :first-child {
+    justify-self: start;
+  }
+
+  :last-child {
+    justify-self: end;
+  }
+
+  .title {
+    color: white;
+    text-align: center;
+    font-weight: bold;
+  }
 }
 
 .messages {
@@ -70,6 +80,9 @@ body {
   padding: 12px;
   border-top: 1px solid #eee;
   gap: 8px;
+  position: sticky;
+  bottom: 0;
+  background-color: white;
 }
 
 .message-input {
