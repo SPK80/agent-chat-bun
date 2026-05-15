@@ -4,6 +4,7 @@ import {
   useEffect,
   type KeyboardEventHandler,
   Fragment,
+  useMemo,
 } from "react";
 import "./Chat.css";
 import ReactMarkdown from "react-markdown";
@@ -13,6 +14,7 @@ import { CloseOutlined, DeleteOutlined, SendOutlined } from "@ant-design/icons";
 import ModelsSelect from "../../../components/ModelsSelect";
 import { useOllamaChat } from "../hooks/useOllamaChat";
 import { TypingIndicator } from "../../../components/TypingIndicator";
+import ChatMessage from "./ChatMessage";
 
 interface IProps {
   id: string;
@@ -71,7 +73,25 @@ export const Chat = ({ id }: IProps) => {
 
   const handleKeyUp: KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
     if (e.key === "Enter") {
+      e.preventDefault();
       send();
+    }
+  };
+
+  const lastUserMessageIndex = useMemo(() => {
+    let index = messages.length - 1;
+    while (index > 0 && messages[index]?.role !== "user") {
+      index -= 1;
+    }
+    return index;
+  }, [messages]);
+
+  const undo = () => {
+    const content = messages[lastUserMessageIndex]?.content;
+
+    if (content) {
+      setInputValue(content);
+      setMessages(messages.slice(0, lastUserMessageIndex));
     }
   };
 
@@ -91,11 +111,11 @@ export const Chat = ({ id }: IProps) => {
         <div className="messages">
           {messages.map((msg, index) => (
             <Fragment key={index}>
-              <div
-                className={`message ${msg.role === "user" ? "sent" : "received"}`}
-              >
-                <ReactMarkdown>{msg.content}</ReactMarkdown>
-              </div>
+              <ChatMessage
+                message={msg}
+                onUndo={undo}
+                canUndo={!waiting && index === lastUserMessageIndex}
+              />
               {index === messages.length - 1 &&
                 msg.role === "user" &&
                 waiting && (
